@@ -109,6 +109,13 @@ func (d MySQLDriver) Open(dsn string) (driver.Conn, error) {
 		return nil, err
 	}
 
+	// Handle DSN Params
+	err = mc.handleParams()
+	if err != nil {
+		mc.Close()
+		return nil, err
+	}
+
 	if mc.cfg.MaxAllowedPacket > 0 {
 		mc.maxAllowedPacket = mc.cfg.MaxAllowedPacket
 	} else {
@@ -122,13 +129,6 @@ func (d MySQLDriver) Open(dsn string) (driver.Conn, error) {
 	}
 	if mc.maxAllowedPacket < maxPacketSize {
 		mc.maxWriteSize = mc.maxAllowedPacket
-	}
-
-	// Handle DSN Params
-	err = mc.handleParams()
-	if err != nil {
-		mc.Close()
-		return nil, err
 	}
 
 	return mc, nil
