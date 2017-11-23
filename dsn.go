@@ -290,12 +290,17 @@ func ParseDSN(dsn string) (cfg *Config, err error) {
 						// Find the first ':' in dsn[:j]
 						for k = 0; k < j; k++ {
 							if dsn[k] == ':' {
-								cfg.Passwd = dsn[k+1 : j]
+								cfg.Passwd, err = url.QueryUnescape(dsn[k+1 : j])
+								if err != nil {
+									cfg.Passwd = dsn[k+1 : j]
+								}
 								break
 							}
 						}
-						cfg.User = dsn[:k]
-
+						cfg.User, err = url.QueryUnescape(dsn[:k])
+						if err != nil {
+							cfg.User = dsn[:k]
+						}
 						break
 					}
 				}
